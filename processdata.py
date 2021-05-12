@@ -30,6 +30,14 @@ class CQTSpectrumDataset(TorchDataset):
 
             self.features.append((filename, label))
 
+            # label_file = file.csv or lable = "file.txt"
+            # csv contains two column: 1 data_name lable_name
+            # file_to_read = label_file 
+            # file_list= list.append(file_to_read)
+             
+            # file.wav label1
+            # wav file transfer to mfcc cqcc etc...
+            
         # print(self.features)
 
 
