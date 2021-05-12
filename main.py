@@ -2,6 +2,9 @@ import torch
 import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
+from processdata import CQTSpectrumDataset
+import torchvision.models as models
+
 
 
 # Device configuration
@@ -10,12 +13,26 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 # Hyper parameters
 num_epochs = 5
 num_classes = 10
-# batch_size = 100
+batch_size = 100
 learning_rate = 0.001
 
 # -- lOAD IN THE CQT SPECTRUM LIST --
 
-class VGG(nn.Module):
+train_dataset = CQTSpectrumDataset(file_label_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.train.trn.txt', 
+                                    audio_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_train/flac/')
+test_dataset = CQTSpectrumDataset(file_label_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.dev.trl.txt', 
+                                    audio_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_dev/flac/')
+
+
+train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
+                                           batch_size=batch_size, 
+                                           shuffle=False)
+
+test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
+                                          batch_size=batch_size, 
+                                          shuffle=False)
+
+""" class VGG(nn.Module):
     def __init__(self, num_classes=10):
         super(VGG, self).__init__()
         self.features = nn.Sequential(
@@ -52,16 +69,18 @@ class VGG(nn.Module):
             out = self.fc(out)
             return out
 
-model = VGG(num_classes).to(device)
+model = VGG(num_classes).to(device) """
+
+model = models.vgg16().to(device)
 
 # Loss and optimizer
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 # Train the model
-total_step = len(dataset)
+total_step = len(train_loader)
 for epoch in range(num_epochs):
-    for i, (spectrums, labels) in enumerate(dataset):
+    for i, (spectrums, labels) in enumerate(train_loader):
         spectrums = spectrums.to(device)
         labels = labels.to(device)
         
