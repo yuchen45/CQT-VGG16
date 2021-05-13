@@ -2,6 +2,7 @@ from torch.utils.data import Dataset as TorchDataset
 import os
 import librosa
 import numpy as np
+from sklearn import preprocessing
 
 
 class CQTSpectrumDataset(TorchDataset):
@@ -9,12 +10,23 @@ class CQTSpectrumDataset(TorchDataset):
     def __init__(self, file_label_path , audio_path=""):
 
         filename_with_label = {}
+        # labellist = []
         for labelfile in open(file_label_path):
             labelfile = labelfile.split()
             # get label with filename
-            filename, label = labelfile[1], labelfile[-1]
+            filename = labelfile[1]
+            if labelfile[-1] == 'bonafide' :
+                label = 0
+            if labelfile[-1] == 'spoof':
+                label = 1
             # store filename and label in dictionary 
             filename_with_label[filename] = label
+            #labellist.append(label)
+
+
+        #labellist = preprocessing.LabelBinarizer().fit_transform(labellist)
+        #labellist = np.array(labellist).tolist()
+        
 
         self.features = []
         for datafile in os.listdir(audio_path):
@@ -56,9 +68,13 @@ class CQTSpectrumDataset(TorchDataset):
         cqt = np.abs(librosa.cqt(y, sr=sr))
         # cqt_spectrum = librosa.amplitude_to_db(cqt, ref=np.max)
         cqt.resize(84,360)
+        cqt = np.expand_dims(cqt, 0)
         return cqt, label
 
 
     def __len__(self):
         return len(self.features)
-    
+
+
+train_dataset = CQTSpectrumDataset(file_label_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.train.trn.txt', 
+                                    audio_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_train/flac/')

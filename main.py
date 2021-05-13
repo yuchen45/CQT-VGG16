@@ -32,44 +32,29 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
                                           batch_size=batch_size, 
                                           shuffle=False)
 
-""" class VGG(nn.Module):
+""" class ConvNet(nn.Module):
     def __init__(self, num_classes=10):
-        super(VGG, self).__init__()
-        self.features = nn.Sequential(
-            nn.Conv2d(3,96,(7, 7),(2, 2)),
+        super(ConvNet, self).__init__()
+        self.layer1 = nn.Sequential(
+            nn.Conv2d(1, 16, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(16),
             nn.ReLU(),
-            SpatialCrossMapLRN(5, 0.0005, 0.75, 2),
-            nn.MaxPool2d((3, 3),(2, 2),(0, 0),ceil_mode=True),
-            nn.Conv2d(96,256,(5, 5),(2, 2),(1, 1)),
+            nn.MaxPool2d(kernel_size=2, stride=2))
+        self.layer2 = nn.Sequential(
+            nn.Conv2d(16, 32, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(32),
             nn.ReLU(),
-            SpatialCrossMapLRN(5, 0.0005, 0.75, 2),
-            nn.MaxPool2d((3, 3),(2, 2),(0, 0),ceil_mode=True),
-            nn.Conv2d(256,512,(3, 3),(1, 1),(1, 1)),
-            nn.ReLU(),
-            nn.Conv2d(512,512,(3, 3),(1, 1),(1, 1)),
-            nn.ReLU(),
-            nn.Conv2d(512,512,(3, 3),(1, 1),(1, 1)),
-            nn.ReLU(),
-            nn.MaxPool2d((3, 3),(2, 2),(0, 0),ceil_mode=True)
-        )
-        self.classif = nn.Sequential(
-            nn.Linear(18432,4096),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(4096,4096),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-        )
-        self.fc = nn.Linear(4096,num_classes)
+            nn.MaxPool2d(kernel_size=2, stride=2))
+        self.fc = nn.Linear(7*7*32, num_classes)
+        
+    def forward(self, x):
+        out = self.layer1(x)
+        out = self.layer2(out)
+        out = out.reshape(out.size(0), -1)
+        out = self.fc(out)
+        return out
 
-        def forward(self, x):
-            out = self.features(x)
-            out = self.classif(out)
-            out = out.reshape(out.size(0), -1)
-            out = self.fc(out)
-            return out
-
-model = VGG(num_classes).to(device) """
+model = ConvNet(num_classes).to(device) """
 
 model = models.vgg16().to(device)
 
@@ -81,8 +66,11 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 total_step = len(train_loader)
 for epoch in range(num_epochs):
     for i, (spectrums, labels) in enumerate(train_loader):
+        spectrums = spectrums.expand(-1, 3, -1, -1)
         spectrums = spectrums.to(device)
+        print ('images: ', spectrums.shape)
         labels = labels.to(device)
+        
         
         # Forward pass
         outputs = model(spectrums)
