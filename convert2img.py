@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import os
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--data_path", required=True, type=str, help='path to ASVSpoof data directory. For example, LA/ASVspoof2019_LA_train/flac/')
+parser.add_argument("--data_path", required=True, type=str, help='path to ASVSpoof data directory. For example, ./ASVspoof_Data_test/LA/ASVspoof2019_LA_train/flac/')
 parser.add_argument("--output_path", required=True, type=str, help='path to output pickle file. For example, ./training_imgs/')
 args = parser.parse_args()
 
