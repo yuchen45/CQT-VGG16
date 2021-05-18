@@ -16,7 +16,7 @@ num_classes = 2
 batch_size = 52
 learning_rate = 0.0001
 
-# -- lOAD IN THE CQT SPECTRUM LIST --
+# -- lOAD IN THE CQT SPECTRUM IMAGES --
 
 train_dataset = CQTSpectrumDataset(file_label_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.train.trn.txt', 
                                     audio_path='./training_imgs/')
@@ -32,30 +32,8 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
                                           batch_size=batch_size, 
                                           shuffle=False)
 
-""" class ConvNet(nn.Module):
-    def __init__(self, num_classes=10):
-        super(ConvNet, self).__init__()
-        self.layer1 = nn.Sequential(
-            nn.Conv2d(1, 16, kernel_size=5, stride=1, padding=2),
-            nn.BatchNorm2d(16),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
-        self.layer2 = nn.Sequential(
-            nn.Conv2d(16, 32, kernel_size=5, stride=1, padding=2),
-            nn.BatchNorm2d(32),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
-        self.fc = nn.Linear(7*7*32, num_classes)
-        
-    def forward(self, x):
-        out = self.layer1(x)
-        out = self.layer2(out)
-        out = out.reshape(out.size(0), -1)
-        out = self.fc(out)
-        return out
 
-model = ConvNet(num_classes).to(device) """
-
+# Pytorch VGG16 Model
 model = models.vgg16().to(device)
 
 # Loss and optimizer
@@ -66,9 +44,9 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 total_step = len(train_loader)
 for epoch in range(num_epochs):
     for i, (spectrums, labels) in enumerate(train_loader):
-        spectrums = spectrums.expand(-1, 3, -1, -1)
+        #spectrums = spectrums.expand(-1, 3, -1, -1)
         spectrums = spectrums.to(device)
-        # print ('images: ', spectrums.shape)
+        print ('images: ', spectrums.shape)
         labels = labels.to(device)
         
         

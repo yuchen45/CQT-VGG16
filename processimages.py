@@ -7,26 +7,31 @@ from torchvision import transforms
 from skimage import io
 import torch 
 
+# Custom dataset class
 class CQTSpectrumDataset(TorchDataset):
     def __init__(self, file_label_path , audio_path=""):
 
+        # Extract file names with their associated labels
         self.filename_with_label = {}
         for labelfile in open(file_label_path):
+            # get file name
             labelfile = labelfile.split()
 
             # filename, label = labelfile[1], labelfile[-1]
 
+            # TODO: Convert labels to onehot 
             filename = labelfile[1]
             if labelfile[-1] == 'bonafide' :
                 label = 0
             if labelfile[-1] == 'spoof':
                 label = 1
             
-            
+            # assigning each filename with a label
             self.filename_with_label[filename] = label
 
         
         self.features = []
+        # Iterate through the audio_path and get the filenames with their associated labels
         for datafile in os.listdir(audio_path):
             # get filename
             filename = datafile.split('.')[0]
@@ -46,14 +51,19 @@ class CQTSpectrumDataset(TorchDataset):
     
 
     def __getitem__(self, index):
+        # Get file name and label
         feature, label = self.features[index]
+
+        # locate the image in audio_path and read in the image as a numpy array
         imageloc = os.path.join(self.audio_path, feature + "." + 'png')
         image = io.imread(imageloc)
-        #print ("before tensor shape: ", image.shape)
+
+        # Convert 1 channel to 3 channels
         image = np.stack((image,) * 3, axis=-1)
-        #print ("after numpy 3 channel shape: ", image.shape)
+
+        # transform numpy to tensor
         img_as_tensor = self.to_tensor(image)
-        #print("img_as_tensor shape: ", img_as_tensor.shape)
+
         return img_as_tensor, label
 
 
@@ -61,13 +71,3 @@ class CQTSpectrumDataset(TorchDataset):
         return len(self.features)
 
 
-""" train_dataset = CQTSpectrumDataset(file_label_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.train.trn.txt', 
-                                    audio_path='./training_imgs/')
-
-train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
-                                           batch_size=10, 
-                                           shuffle=False)
-
-for i, (spectrums, labels) in enumerate(train_loader):
-    print ('images: ', spectrums.shape)
-    print('label: ', labels) """
