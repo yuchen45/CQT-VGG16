@@ -14,9 +14,9 @@ args = parser.parse_args()
 def spectrum_image(y, sr, filename, output_path):
     C = np.abs(librosa.cqt(y, sr=sr))
     C.resize(84,360)
-    plt.figure()
+    #plt.figure()
     C = librosa.amplitude_to_db(C)
-    plt.imshow(C)
+    #plt.imshow(C)
     out = output_path + filename + '.png'
     skimage.io.imsave(out, C)
 

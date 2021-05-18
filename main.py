@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
-from processdata import CQTSpectrumDataset
+from processimages import CQTSpectrumDataset
 import torchvision.models as models
 
 
@@ -11,17 +11,17 @@ import torchvision.models as models
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 # Hyper parameters
-num_epochs = 5
+num_epochs = 200
 num_classes = 2
-batch_size = 100
-learning_rate = 0.001
+batch_size = 52
+learning_rate = 0.0001
 
 # -- lOAD IN THE CQT SPECTRUM LIST --
 
 train_dataset = CQTSpectrumDataset(file_label_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.train.trn.txt', 
-                                    audio_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_train/flac/')
+                                    audio_path='./training_imgs/')
 test_dataset = CQTSpectrumDataset(file_label_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.dev.trl.txt', 
-                                    audio_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_dev/flac/')
+                                    audio_path='./testing_imgs/')
 
 
 train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
@@ -68,7 +68,7 @@ for epoch in range(num_epochs):
     for i, (spectrums, labels) in enumerate(train_loader):
         spectrums = spectrums.expand(-1, 3, -1, -1)
         spectrums = spectrums.to(device)
-        print ('images: ', spectrums.shape)
+        # print ('images: ', spectrums.shape)
         labels = labels.to(device)
         
         
@@ -95,9 +95,14 @@ with torch.no_grad():
         spectrums = spectrums.to(device)
         labels = labels.to(device)
         outputs = model(spectrums)
+        # print ('outputs: ', outputs.data)
+        print ('outputs shape: ', outputs.shape)
         _, predicted = torch.max(outputs.data, 1)
+        print('predicted: ', predicted)
         total += labels.size(0)
+        print('total: ', total)
         correct += (predicted == labels).sum().item()
+        print('correct: ', correct)
 
     print('Test Accuracy of the model on the 10000 test spectrums: {} %'.format(100 * correct / total))
 
