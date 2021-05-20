@@ -11,9 +11,9 @@ import torchvision.models as models
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 # Hyper parameters
-num_epochs = 200
+num_epochs = 100
 num_classes = 2
-batch_size = 52
+batch_size = 50
 learning_rate = 0.0001
 
 # -- lOAD IN THE CQT SPECTRUM IMAGES --
@@ -75,6 +75,7 @@ with torch.no_grad():
         outputs = model(spectrums)
         # print ('outputs: ', outputs.data)
         print ('outputs shape: ', outputs.shape)
+        print ('output[1]    ', outputs[1])
         _, predicted = torch.max(outputs.data, 1)
         print('predicted: ', predicted)
         total += labels.size(0)
