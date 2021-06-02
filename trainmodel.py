@@ -18,9 +18,9 @@ learning_rate = 0.0001
 
 # -- lOAD IN THE CQT SPECTRUM IMAGES --
 
-train_dataset = CQTSpectrumDataset(file_label_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.train.trn.txt', 
+train_dataset = CQTSpectrumDataset(file_label_path='./ASVspoof_Data/LA/ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.train.trn.txt', 
                                     image_path='./training_img/',
-                                    audio_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_train/flac/')
+                                    audio_path='./ASVspoof_Data/LA/ASVspoof2019_LA_train/flac/')
 
 
 train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
@@ -38,7 +38,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 # Train the model
 total_step = len(train_loader)
 for epoch in range(num_epochs):
-    for i, (spectrums, labels) in enumerate(train_loader):
+    for i, (spectrums, file_names, labels) in enumerate(train_loader):
         #spectrums = spectrums.expand(-1, 3, -1, -1)
         spectrums = spectrums.to(device)
         print ('images: ', spectrums.shape)

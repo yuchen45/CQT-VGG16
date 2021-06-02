@@ -14,9 +14,9 @@ num_classes = 2
 batch_size = 50
 learning_rate = 0.0001
 
-test_dataset = CQTSpectrumDataset(file_label_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.dev.trl.txt', 
+test_dataset = CQTSpectrumDataset(file_label_path='./ASVspoof_Data/LA/ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.dev.trl.txt', 
                                     image_path='./testing_img/',
-                                    audio_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_dev/flac/')
+                                    audio_path='./ASVspoof_Data/LA/ASVspoof2019_LA_dev/flac/')
 
 test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
                                           batch_size=batch_size, 
@@ -60,7 +60,7 @@ with torch.no_grad():
                 # Log likelihood ratio
                 score = math.log(outputs[i,0]) - math.log(outputs[i,1])
 
-                # Convert integer labels to string
+                # Convert integer labels back to string
                 if label.item() == 0:
                     file_label = 'bonafide'
                 if label.item() == 1:

@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import os
 
 # Parsing arguments
-# Training data: --data_path ./ASVspoof_Data/LA/ASVspoof2019_LA_train/flac/ --output_path ./training_imgs/
-# Testing data: --data_path ./ASVspoof_Data/LA/ASVspoof2019_LA_dev/flac/ --output_path ./testing_imgs/
+# Training data: --data_path ./ASVspoof_Data/LA/ASVspoof2019_LA_train/flac/ --output_path ./training_img/
+# Testing data: --data_path ./ASVspoof_Data/LA/ASVspoof2019_LA_dev/flac/ --output_path ./testing_img/
 parser = argparse.ArgumentParser()
 parser.add_argument("--data_path", required=True, type=str, help='path to ASVSpoof data directory. For example, ./ASVspoof_Data_test/LA/ASVspoof2019_LA_train/flac/')
 parser.add_argument("--output_path", required=True, type=str, help='path to output pickle file. For example, ./training_imgs/')
@@ -31,6 +31,9 @@ for voice_data in os.listdir(args.data_path):
 
     # get filename without extension
     filename = voice_data.split('.')[0]
+
+    if os.path.exists(args.output_path + filename + '.png'):
+        continue
 
     # get signal and sample rate from audio
     audio_input = os.path.join(args.data_path, voice_data)
