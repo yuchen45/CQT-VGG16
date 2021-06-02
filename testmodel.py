@@ -22,10 +22,11 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
                                           batch_size=batch_size, 
                                           shuffle=False)
 
-
+# trained model
 PATH = 'model.ckpt'
 
 model = models.vgg16().to(device)
+# Load saved training model
 model.load_state_dict(torch.load(PATH))
 
 model.eval()  # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)

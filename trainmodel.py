@@ -21,18 +21,11 @@ learning_rate = 0.0001
 train_dataset = CQTSpectrumDataset(file_label_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.train.trn.txt', 
                                     image_path='./training_img/',
                                     audio_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_train/flac/')
-test_dataset = CQTSpectrumDataset(file_label_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.dev.trl.txt', 
-                                    image_path='./testing_img/',
-                                    audio_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_dev/flac/')
 
 
 train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
                                            batch_size=batch_size, 
                                            shuffle=False)
-
-test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
-                                          batch_size=batch_size, 
-                                          shuffle=False)
 
 
 # Pytorch VGG16 Model
