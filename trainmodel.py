@@ -11,7 +11,7 @@ import torchvision.models as models
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 # Hyper parameters
-num_epochs = 100
+num_epochs = 30
 num_classes = 2
 batch_size = 50
 learning_rate = 0.0001
@@ -19,9 +19,11 @@ learning_rate = 0.0001
 # -- lOAD IN THE CQT SPECTRUM IMAGES --
 
 train_dataset = CQTSpectrumDataset(file_label_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.train.trn.txt', 
-                                    audio_path='./training_imgs/')
+                                    image_path='./training_img/',
+                                    audio_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_train/flac/')
 test_dataset = CQTSpectrumDataset(file_label_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_cm_protocols/ASVspoof2019.LA.cm.dev.trl.txt', 
-                                    audio_path='./testing_imgs/')
+                                    image_path='./testing_img/',
+                                    audio_path='./ASVspoof_Data_test/LA/ASVspoof2019_LA_dev/flac/')
 
 
 train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
@@ -64,7 +66,7 @@ for epoch in range(num_epochs):
                    .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
 
 
-# Test the model
+""" # Test the model
 model.eval()  # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)
 with torch.no_grad():
     correct = 0
@@ -83,7 +85,7 @@ with torch.no_grad():
         correct += (predicted == labels).sum().item()
         print('correct: ', correct)
 
-    print('Test Accuracy of the model on the 10000 test spectrums: {} %'.format(100 * correct / total))
+    print('Test Accuracy of the model on the 10000 test spectrums: {} %'.format(100 * correct / total)) """
 
 # Save the model checkpoint
 torch.save(model.state_dict(), 'model.ckpt')

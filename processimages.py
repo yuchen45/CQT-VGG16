@@ -9,7 +9,7 @@ import torch
 
 # Custom dataset class
 class CQTSpectrumDataset(TorchDataset):
-    def __init__(self, file_label_path , audio_path=""):
+    def __init__(self, file_label_path , image_path="", audio_path=""):
 
         # Extract file names with their associated labels
         self.filename_with_label = {}
@@ -31,8 +31,8 @@ class CQTSpectrumDataset(TorchDataset):
 
         
         self.features = []
-        # Iterate through the audio_path and get the filenames with their associated labels
-        for datafile in os.listdir(audio_path):
+        # Iterate through the image_path and get the filenames with their associated labels
+        for datafile in os.listdir(image_path):
             # get filename
             filename = datafile.split('.')[0]
 
@@ -46,25 +46,39 @@ class CQTSpectrumDataset(TorchDataset):
             self.features.append((filename, label))
         
 
+        self.image_path=image_path
         self.audio_path=audio_path
         self.to_tensor = transforms.ToTensor()
     
 
     def __getitem__(self, index):
         # Get file name and label
-        feature, label = self.features[index]
+        file_name, label = self.features[index]
 
-        # locate the image in audio_path and read in the image as a numpy array
-        imageloc = os.path.join(self.audio_path, feature + "." + 'png')
+        # Get Audio file and load signal and sample frequency
+        audio_path = os.path.join(self.audio_path, file_name + "." + 'flac')
+        y,sr = librosa.load(audio_path)
+
+        # Extract MFCC features
+        mfcc = np.abs(librosa.feature.mfcc(y, sr))
+        mfcc.resize(84,360)
+
+        D = librosa.stft(y)
+        _, phase = librosa.magphase(D)
+        phase = np.angle(phase)
+        phase.resize(84,360)
+
+        # locate the image in image_path and read in the image as a numpy array
+        imageloc = os.path.join(self.image_path, file_name + "." + 'png')
         image = io.imread(imageloc)
 
         # Convert 1 channel to 3 channels
-        image = np.stack((image,) * 3, axis=-1)
+        image = np.stack((image,mfcc,phase), axis=-1)
 
         # transform numpy to tensor
         img_as_tensor = self.to_tensor(image)
 
-        return img_as_tensor, label
+        return img_as_tensor, file_name, label
 
 
     def __len__(self):
